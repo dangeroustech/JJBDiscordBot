@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  andrewbot:
+    container_name: andrewbot
+    build: .
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.andrewbot.entrypoints=https"
+      - "traefik.http.routers.andrewbot.rule=Host(`andrewbot.init.tools`)"
+      - "traefik.http.routers.andrewbot.tls.certresolver=le"
+      - "traefik.http.services.andrewbot.loadbalancer.server.port=8080"
+    networks:
+      - traefik_proxy
+
+networks:
+  traefik_proxy:
+    external: true
