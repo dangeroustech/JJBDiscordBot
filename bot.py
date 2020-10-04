@@ -37,6 +37,7 @@ async def on_ready():
     for member in guild.members:
         print(f' - {member.name}')
 
+    await send_reboot_message()
     await post_commands()
 
 
@@ -74,7 +75,6 @@ async def post_commands():
     # post current commands to the welcome channel
     guild = client.get_guild(guildID)
 
-    # make this better
     for channel in guild.channels:
         if channel.name == 'welcome-and-rules':
             await delete_old_commands(channel)
@@ -108,5 +108,17 @@ async def delete_old_commands(channel):
         if message.author == client.user:
             await message.delete()
 
+
+async def send_reboot_message():
+    # ping the bot-test channel with a reboot message
+
+    global guildID
+
+    guild = client.get_guild(guildID)
+
+    for channel in guild.channels:
+        if channel.name == 'bot-test':
+            await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The Redheaded Step-child')
+            break
 
 client.run(TOKEN)
