@@ -63,8 +63,8 @@ jobs:
           if git diff --quiet main origin/main; then
               echo "No Changes Required"
           else
-              git pull
               rm .env
+              git pull
               touch .env
               echo DISCORD_TOKEN=${{ secrets.BOT_TOKEN }} >> .env
               echo DISCORD_GUILD="Just Jenny and Brad" >> .env
