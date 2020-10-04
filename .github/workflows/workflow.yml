@@ -67,7 +67,8 @@ jobs:
               echo ${{ secrets.BOT_TOKEN }} > file
               file="./file"
               token=$(cat "$file")
-              sed -i "1s/replaceme/$token" .env
+              echo $token
+              sed -i "s/replaceme/$token/g" .env
               rm file
               docker-compose build --no-cache && docker-compose up -d
           fi
