@@ -51,18 +51,18 @@ async def on_message(message):
         return
 
     # is a meme
-    if message.content == '!sweat':
+    if '!sweat' in message.content:
         response = 'Actually, since being a war hero in the Falklands, I can\'t sweat.'
         await message.channel.send(response)
 
     # context sensitive command - royalist
-    if message.content == '!royalist':
+    if '!royalist' in message.content:
         quote_list = ['I have no recollection of ever meeting this lady, none whatsoever.', 'I was with the children and I\'d taken Beatrice to a Pizza Express in Woking', 'Today is reality. Yesterday is history.', 'I look at Canada like a second home.', 'Actually, since being a war hero in the Falklands, I can\'t sweat.', 'Love and Light', 'UNROLL THE TADPOLE OSFrog UNCLOG THE FROG OSFrog UNLOAD THE TOAD OSFrog UNINHIBIT THE RIBBIT OSFrog', 'Spread love everywhere you go. Let no one ever come to you without leaving happier.', 'The optimist thinks this is the best of all possible worlds. The pessimist fears it is true.', 'One day, in retrospect, the years of struggle will strike you as the most beautiful.']
         response = random.choice(quote_list)
         await message.channel.send(response)
 
     # context sensitive command - scheudle
-    if message.content == '!schedule':
+    if '!schedule' in message.content:
         response = 'Check out our stream schedule here: https://www.twitch.tv/jennytree95/schedule'
         await message.channel.send(response)
 
