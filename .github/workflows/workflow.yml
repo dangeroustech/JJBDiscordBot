@@ -60,7 +60,7 @@ jobs:
           ssh-add ~/.ssh/github
           cd /opt/dockers/JJBDiscordBot
           git fetch
-          if git diff --quiet master origin/master; then
+          if git diff --quiet main origin/main; then
               echo "No Changes Required"
           else
               git pull
