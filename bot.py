@@ -1,10 +1,12 @@
 import os
+import sys
 import discord
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
+GUILDTEMP = os.getenv('DISCORD_GUILD')
+guildID = 0
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -12,9 +14,20 @@ client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
+    global guildID
+
+    # find correct guild
     for guild in client.guilds:
-        if guild.name == GUILD:
+        if guild.name == GUILDTEMP:
+            guildID = guild.id
             break
+
+    guild = client.get_guild(guildID)
+
+    # exit if something is wrong with the guild discovery
+    if guild == 0:
+        print('Something\'s Wrong... Please to be Fixing...')
+        sys.exit(999)
 
     print(
         f'{client.user} is connected to the following guild:\n'
@@ -27,6 +40,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    global guildID
+
+    # make sure we don't trigger on our own messages
     if message.author == client.user:
         return
 
@@ -37,13 +53,8 @@ async def on_message(message):
 
     # controls role assignment for those who accept
     if message.channel.name == 'mods-discussion' and message.content == '!acceptrules':
-
-        for guild in client.guilds:
-            if guild.name == GUILD:
-                break
-
+        guild = client.get_guild(guildID)
         member = guild.get_member(message.author.id)
-
         await member.add_roles(guild.get_role(762318229514485801), reason=f'User {message.author} accepted rules')
 
 client.run(TOKEN)
