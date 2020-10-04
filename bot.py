@@ -52,9 +52,18 @@ async def on_message(message):
         await message.channel.send(response)
 
     # controls role assignment for those who accept
-    if message.channel.name == 'mods-discussion' and message.content == '!acceptrules':
-        guild = client.get_guild(guildID)
-        member = guild.get_member(message.author.id)
-        await member.add_roles(guild.get_role(762318229514485801), reason=f'User {message.author} accepted rules')
+    if message.channel.name == 'welcome-and-rules':
+        # grant users the 'ThirstTrap' role
+        if message.content == '!acceptrules':
+            guild = client.get_guild(guildID)
+            member = guild.get_member(message.author.id)
+            await member.add_roles(guild.get_role(762318229514485801), reason=f'User {message.author} accepted rules')
+            await message.delete()
+        # handle users posting something else in this channel
+        elif (message.author.name != 'Rocketman162' or
+              message.author.name != 'biodrone' or
+              message.author.name != 'Tombo_-'):
+            await message.delete()
+
 
 client.run(TOKEN)
