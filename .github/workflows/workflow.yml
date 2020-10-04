@@ -64,10 +64,9 @@ jobs:
               echo "No Changes Required"
           else
               git pull
-              echo ${{ secrets.BOT_TOKEN }} > file
-              file="./file"
-              token=$(cat "$file")
-              sed -i "s/replaceme/$token/g" .env
-              rm file
+              rm .env
+              touch .env
+              echo DISCORD_TOKEN=${{ secrets.BOT_TOKEN }} >> .env
+              echo DISCORD_GUILD="Just Jenny and Brad" >> .env
               docker-compose build --no-cache && docker-compose up -d
           fi
