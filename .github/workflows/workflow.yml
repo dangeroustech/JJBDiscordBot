@@ -64,7 +64,9 @@ jobs:
               echo "No Changes Required"
           else
               git pull
-              VAR=${{ secrets.BOT_TOKEN }}
-              sed -i "1s/replaceme/$VAR" .env
+              echo ${{ secrets.BOT_TOKEN }} > file
+              file="./file"
+              token=$(cat "$file")
+              sed -i "1s/replaceme/$token" .env
               docker-compose build --no-cache && docker-compose up -d
           fi
