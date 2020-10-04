@@ -38,6 +38,9 @@ async def on_ready():
     for member in guild.members:
         print(f' - {member.name}')
 
+    await send_reboot_message()
+    await post_commands()
+
 
 @client.event
 async def on_message(message):
@@ -77,5 +80,57 @@ async def on_message(message):
               message.author.name != 'Tombo_-'):
             await message.delete()
 
+
+async def post_commands():
+    global guildID
+
+    # post current commands to the welcome channel
+    guild = client.get_guild(guildID)
+
+    for channel in guild.channels:
+        if channel.name == 'welcome-and-rules':
+            await delete_old_commands(channel)
+
+            commands = parse_commands()
+
+            ls = "My commands are:\n"
+            for key in commands:
+                ls = ls + key + "\n" + "  - " + commands[key] + "\n"
+
+            await channel.send(ls.replace("him", "me").replace("his", "my"))
+            break
+
+
+def parse_commands():
+    # parse the currently available commands
+    commands = {}
+
+    with open('README.md') as f:
+        for line in f:
+            if line[0] == '-':
+                commands.update({f'{line.lstrip("- ").rstrip()}': f'{f.readline().lstrip("- ").rstrip()}'})
+
+    return commands
+
+
+async def delete_old_commands(channel):
+    # delete the last commands message
+
+    async for message in channel.history(limit=2, oldest_first=False):
+        if message.author == client.user:
+            await message.delete()
+
+
+async def send_reboot_message():
+    # ping the bot-test channel with a reboot message
+
+    global guildID
+
+    guild = client.get_guild(guildID)
+
+    for channel in guild.channels:
+        if channel.name == 'bot-test':
+            await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The Redheaded Step-child')
+            break
 
 client.run(TOKEN)
