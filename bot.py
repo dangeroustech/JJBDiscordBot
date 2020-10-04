@@ -30,8 +30,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    # is a meme
     if message.content == '!sweat':
-        response = "Actually, since being a war hero in the Falklands, I can't sweat."
+        response = 'Actually, since being a war hero in the Falklands, I can\'t sweat.'
         await message.channel.send(response)
 
 
