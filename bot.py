@@ -76,7 +76,7 @@ async def post_commands():
 
     # make this better
     for channel in guild.channels:
-        if channel.name == 'bot-test':
+        if channel.name == 'welcome-and-rules':
             await delete_old_commands(channel)
 
             commands = parse_commands()
