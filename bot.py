@@ -131,7 +131,7 @@ async def send_reboot_message():
 
     for channel in guild.channels:
         if channel.name == 'bot-test':
-            await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The Redheaded Step-child')
+            await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The One Formerly Named Markle')
             break
 
 client.run(TOKEN)
