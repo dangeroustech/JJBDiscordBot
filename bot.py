@@ -103,7 +103,7 @@ async def on_message(message):
                 message.author.name == 'biodrone' or
                 message.author.name == 'Tombo_-'
         ):
-            await message.channel.send(''.join(get_royalist()))
+            await message.channel.send(''.join(list_royalist()))
         else:
             # maybe send a DM here too
             print(message.author.name)
@@ -212,6 +212,19 @@ def get_royalist():
     with open('royalist') as f:
         for line in f:
             quotes.append(line)
+
+    return quotes
+
+
+def list_royalist():
+    # get all royalist quotes
+    quotes = []
+
+    with open('royalist') as f:
+        num = 1
+        for line in f:
+            quotes.append(str(num) + " - " + line)
+            num += 1
 
     return quotes
 
