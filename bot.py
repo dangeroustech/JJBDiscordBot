@@ -1,3 +1,5 @@
+# TODO: Add an approved_user func to thin down some repeated functionality
+
 import os
 import sys
 import discord
@@ -14,6 +16,20 @@ guildID = 0
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
+
+
+def main(argv):
+    global debug
+
+    parser = argparse.ArgumentParser(prog='python bot.py',
+                                     description='Be a swagalicious royalist discord bot')
+    parser.add_argument('-d', '--debug', required=False, help='Set Debug Mode for Local Dev', action='store_true')
+    args = parser.parse_args()
+
+    if args.debug:
+        debug = True
+
+    client.run(TOKEN)
 
 
 # runs when client is initially ready
@@ -63,9 +79,52 @@ async def on_message(message):
 
     # context sensitive command - royalist
     if '!royalist' in message.content:
-        quote_list = ['I have no recollection of ever meeting this lady, none whatsoever.', 'I was with the children and I\'d taken Beatrice to a Pizza Express in Woking', 'Today is reality. Yesterday is history.', 'I look at Canada like a second home.', 'Actually, since being a war hero in the Falklands, I can\'t sweat.', 'Love and Light', 'UNROLL THE TADPOLE OSFrog UNCLOG THE FROG OSFrog UNLOAD THE TOAD OSFrog UNINHIBIT THE RIBBIT OSFrog', 'Spread love everywhere you go. Let no one ever come to you without leaving happier.', 'The optimist thinks this is the best of all possible worlds. The pessimist fears it is true.', 'One day, in retrospect, the years of struggle will strike you as the most beautiful.']
-        response = random.choice(quote_list)
+        quote_list = []
+        response = random.choice(get_royalist())
         await message.channel.send(response)
+
+    # add a command to the royalist list (only if approved user)
+    if '!addroyalist' in message.content:
+        if (
+                message.author.name == 'Rocketman162' or
+                message.author.name == 'biodrone' or
+                message.author.name == 'Tombo_-'
+        ):
+            add_royalist(message.content)
+            await message.channel.send(f'Added Quote: {str(message.content).lstrip("!addroyalist ")}')
+        else:
+            # maybe send a DM here too
+            await message.delete()
+
+    # get the royalist list (only if approved user)
+    if '!getroyalist' in message.content:
+        if (
+                message.author.name == 'Rocketman162' or
+                message.author.name == 'biodrone' or
+                message.author.name == 'Tombo_-'
+        ):
+            await message.channel.send(''.join(get_royalist()))
+        else:
+            # maybe send a DM here too
+            print(message.author.name)
+            await message.delete()
+
+    # delete a royalist command (only if approved user)
+    if '!delroyalist' in message.content:
+        if (
+                message.author.name == 'Rocketman162' or
+                message.author.name == 'biodrone' or
+                message.author.name == 'Tombo_-'
+        ):
+            response = del_royalist(message.content.lstrip('!delroyalist '))
+            if response == "ERROR":
+                await message.channel.send("There Aren't That Many Quotes... Learn to Math Please.")
+            else:
+                await message.channel.send("Removed Quote: {}".format(response))
+        else:
+            # maybe send a DM here too
+            print(message.author.name)
+            await message.delete()
 
     # context sensitive command - scheudle
     if '!schedule' in message.content:
@@ -81,9 +140,11 @@ async def on_message(message):
             await member.add_roles(guild.get_role(762318229514485801), reason=f'User {message.author} accepted rules')
             await message.delete()
         # handle users posting something else in this channel
-        elif (message.author.name != 'Rocketman162' or
-              message.author.name != 'biodrone' or
-              message.author.name != 'Tombo_-'):
+        elif (
+                message.author.name != 'Rocketman162' or
+                message.author.name != 'biodrone' or
+                message.author.name != 'Tombo_-'
+        ):
             await message.delete()
 
 
@@ -121,7 +182,6 @@ def parse_commands():
 
 # delete the last commands message
 async def delete_old_commands(channel):
-
     async for message in channel.history(limit=2, oldest_first=False):
         if message.author == client.user:
             await message.delete()
@@ -138,18 +198,44 @@ async def send_reboot_message():
             await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The One Formerly Named Markle')
             break
 
-def main(argv):
-    global debug
 
-    parser = argparse.ArgumentParser(prog='python bot.py',
-                                     description='Be a swagalicious royalist discord bot')
-    parser.add_argument('-d', '--debug', required=False, help='Set Debug Mode for Local Dev', action='store_true')
-    args = parser.parse_args()
+def add_royalist(quote):
+    # add a royalist quote
+    with open('royalist', 'a') as f:
+        f.write('\n{}'.format(str(quote).lstrip('!addroyalist ')))
 
-    if args.debug:
-        debug = True
 
-    client.run(TOKEN)
+def get_royalist():
+    # get all royalist quotes
+    quotes = []
+
+    with open('royalist') as f:
+        for line in f:
+            quotes.append(line)
+
+    return quotes
+
+
+def del_royalist(index):
+    # delete a royalist quote
+    # WARN: This writes a newline to the end of the file if the last quote is deleted
+
+    with open('royalist') as f:
+        lines = f.readlines()
+
+    try:
+        removal = lines[int(index) - 1]
+        del lines[int(index) - 1]
+        os.remove('royalist')
+
+        with open('royalist', 'w+') as w:
+            for line in lines:
+                w.write(line)
+
+        return removal
+    except IndexError as e:
+        return "ERROR"
+
 
 if __name__ == '__main__':
     main(sys.argv)
