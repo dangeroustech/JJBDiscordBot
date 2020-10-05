@@ -2,7 +2,10 @@ import os
 import sys
 import discord
 import random
+import argparse
 from dotenv import load_dotenv
+
+debug = False
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -134,4 +137,18 @@ async def send_reboot_message():
             await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The One Formerly Named Markle')
             break
 
-client.run(TOKEN)
+def main(argv):
+    global debug
+
+    parser = argparse.ArgumentParser(prog='python bot.py',
+                                     description='Be a swagalicious royalist discord bot')
+    parser.add_argument('-d', '--debug', required=False, help='Set Debug Mode for Local Dev', action='store_true')
+    args = parser.parse_args()
+
+    if args.debug:
+        debug = True
+
+    client.run(TOKEN)
+
+if __name__ == '__main__':
+    main(sys.argv)
