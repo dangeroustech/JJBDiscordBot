@@ -13,6 +13,7 @@ intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 
 
+# runs when client is initially ready
 @client.event
 async def on_ready():
     global guildID
@@ -42,6 +43,7 @@ async def on_ready():
     await post_commands()
 
 
+# runs when client receives a message
 @client.event
 async def on_message(message):
     global guildID
@@ -81,10 +83,10 @@ async def on_message(message):
             await message.delete()
 
 
+# post current commands to the welcome channel
 async def post_commands():
     global guildID
 
-    # post current commands to the welcome channel
     guild = client.get_guild(guildID)
 
     for channel in guild.channels:
@@ -101,8 +103,8 @@ async def post_commands():
             break
 
 
+# parse the currently available commands
 def parse_commands():
-    # parse the currently available commands
     commands = {}
 
     with open('README.md') as f:
@@ -113,17 +115,16 @@ def parse_commands():
     return commands
 
 
+# delete the last commands message
 async def delete_old_commands(channel):
-    # delete the last commands message
 
     async for message in channel.history(limit=2, oldest_first=False):
         if message.author == client.user:
             await message.delete()
 
 
+# ping the bot-test channel with a reboot message
 async def send_reboot_message():
-    # ping the bot-test channel with a reboot message
-
     global guildID
 
     guild = client.get_guild(guildID)
