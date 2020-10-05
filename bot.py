@@ -42,8 +42,9 @@ async def on_ready():
     for member in guild.members:
         print(f' - {member.name}')
 
-    await send_reboot_message()
-    await post_commands()
+    if not debug:
+        await send_reboot_message()
+        await post_commands()
 
 
 # runs when client receives a message
