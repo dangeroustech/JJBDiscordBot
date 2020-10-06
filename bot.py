@@ -14,10 +14,10 @@ debug = False
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILDTEMP = os.getenv('DISCORD_GUILD')
-client_id = os.getenv('client_id') #needs to be a github secret
-client_secret = os.getenv('client_secret') #needs to be a github secret
-grant_type = 'client_credentials'
-twitch_userID = "jennytree95" #probably needs a better place to live?
+client_id = os.getenv('client_id')
+client_secret = os.getenv('client_secret')
+grant_type = os.getenv('grant_type')
+twitch_userID = os.getenv('twitch_userID')
 API_ENDPOINT = "https://api.twitch.tv/helix/streams?user_login=" + twitch_userID
 guildID = 0
 oauth_token = ""
