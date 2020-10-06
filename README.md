@@ -8,4 +8,6 @@ Andrew will respond to the below commands:
 - !sweat
   - Find out some interesting information about him... 
 - !royalist
-  - Test his memory
+  - Test his memory.
+- !stream
+  - Check if the twitch stream is currently live.
