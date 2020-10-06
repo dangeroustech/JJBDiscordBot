@@ -5,6 +5,8 @@ import sys
 import discord
 import random
 import argparse
+import json
+import requests
 from dotenv import load_dotenv
 
 debug = False
@@ -12,7 +14,14 @@ debug = False
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILDTEMP = os.getenv('DISCORD_GUILD')
+client_id = os.getenv('client_id') #needs to be a github secret
+client_secret = os.getenv('client_secret') #needs to be a github secret
+grant_type = os.getenv('grant_type') #needs to be a github secret
+twitch_userID = "jennytree95" #probably needs a better place to live?
+API_ENDPOINT = "https://api.twitch.tv/helix/streams?user_login=" + twitch_userID
 guildID = 0
+oauth_token = ""
+oauth_timer = 0
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -129,6 +138,12 @@ async def on_message(message):
     # context sensitive command - scheudle
     if '!schedule' in message.content:
         response = 'Check out our stream schedule here: https://www.twitch.tv/jennytree95/schedule'
+        await message.channel.send(response)
+
+    # context sensitive command - stream status
+    if '!stream' in message.content:
+        oauth_token = (get_oauth(client_id, client_secret, grant_type))
+        response = (twitch_getstatus(oauth_token, client_id))
         await message.channel.send(response)
 
     # controls role assignment for those who accept
@@ -248,6 +263,52 @@ def del_royalist(index):
         return removal
     except IndexError as e:
         return "ERROR"
+
+
+def get_oauth(client_id, client_secret, grant_type):
+    oauth_request = requests.post(
+        "https://id.twitch.tv/oauth2/token?client_id=" + client_id + "&client_secret=" + client_secret + "&grant_type=" + grant_type)
+    if oauth_request.status_code == 200:
+        json_response = json.loads(oauth_request.text)
+        #print(json_response)
+        global oauth_timer
+        oauth_timer = (json_response['expires_in'])
+        new_oauth_token = str((json_response['access_token']))
+    return new_oauth_token
+
+
+def twitch_getstatus(oauth_token, client_id):
+    # set data
+    data = {
+        'Authorization': 'Bearer ' + oauth_token,
+        'Client-Id': client_id
+    }
+    # api call here
+    status_response = requests.get(url=API_ENDPOINT, headers=data)
+    # data output
+    if status_response.status_code == 200:
+        json_response = json.loads(status_response.text)
+        #print(json_response)
+        twitch_data = str((json_response['data']))
+        if twitch_data == "[]":
+            return (twitch_userID + " is currently OFFLINE")
+        else:
+            twitch_game_id = str((json_response['data'][0]['game_id']))
+            #twitch_game_name = str(twitch_getgamename(twitch_game_id)) #can't get this to work right now...
+            return ("**" + twitch_userID + "** is currently LIVE :movie_camera:\nGo watch here: https://twitch.tv/" + twitch_userID)
+
+
+def twitch_getgamename(twitch_game_id):
+    data = {
+        'Authorization': 'Bearer ' + oauth_token,
+        'Client-Id': client_id
+    }
+    getgamename_response = requests.get(url="https://api.twitch.tv/helix/games?id=" + twitch_game_id, headers=data)
+    if getgamename_response.status_code == 200:
+        json_response = json.loads(getgamename_response.text)
+        #print(json_response)
+        game_name = (json_response['data'][0]['name'])
+        return game_name
 
 
 if __name__ == '__main__':
