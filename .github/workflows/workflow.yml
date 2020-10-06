@@ -71,6 +71,6 @@ jobs:
               echo client_id=${{ secrets.TWITCH_CLIENT_ID }} >> .env
               echo client_secret=${{ secrets.TWITCH_CLIENT_SECRET }} >> .env
               echo twitch_userID=${{ secrets.TWITCH_USERID }} >> .env
-              echo grant_type=${{ secrets.TWITCH_GRANT_TYPE }}
+              echo grant_type=${{ secrets.TWITCH_GRANT_TYPE }} >> .env
               docker-compose build --no-cache && docker-compose up -d
           fi
