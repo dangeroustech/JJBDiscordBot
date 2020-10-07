@@ -7,6 +7,8 @@ import random
 import argparse
 import json
 import requests
+import getpass
+import socket
 from dotenv import load_dotenv
 
 debug = False
@@ -118,6 +120,19 @@ async def on_message(message):
             print(message.author.name)
             await message.delete()
 
+    # get active/runnin instance information - all running instances respond (only if approved user)
+    if '!showinstance' in message.content:
+        if (
+                message.author.name == 'Rocketman162' or
+                message.author.name == 'biodrone' or
+                message.author.name == 'Tombo_-'
+        ):
+            await message.channel.send(get_environment())
+        else:
+            # maybe send a DM here too
+            print(message.author.name)
+            await message.delete()
+
     # delete a royalist command (only if approved user)
     if '!delroyalist' in message.content:
         if (
@@ -210,7 +225,8 @@ async def send_reboot_message():
 
     for channel in guild.channels:
         if channel.name == 'bot-test':
-            await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The One Formerly Named Markle')
+            run_environment = get_environment()
+            await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The One Formerly Named Markle\n' + run_environment)
             break
 
 
@@ -263,6 +279,13 @@ def del_royalist(index):
         return removal
     except IndexError as e:
         return "ERROR"
+
+
+def get_environment():
+    local_user = getpass.getuser()
+    local_hostname = socket.gethostname()
+    local_environment = ("I have no recollection of ever meeting **" + local_user + "@" + local_hostname + "**")
+    return local_environment
 
 
 def get_oauth(client_id, client_secret, grant_type):
