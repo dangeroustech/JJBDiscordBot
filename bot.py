@@ -152,7 +152,7 @@ async def on_message(message):
 
     # context sensitive command - scheudle
     if '!schedule' in message.content:
-        response = 'Check out our stream schedule here: https://www.twitch.tv/' + twitch_userID + '/schedule'
+        response = f'Check out our stream schedule here: https://www.twitch.tv/{twitch_userID}/schedule'
         await message.channel.send(response)
 
     # context sensitive command - stream status
