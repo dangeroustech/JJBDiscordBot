@@ -295,7 +295,7 @@ def del_royalist(index):
 def get_environment():
     local_user = getpass.getuser()
     local_hostname = socket.gethostname()
-    local_environment = ("I have no recollection of ever meeting **" + local_user + "@" + local_hostname + "**")
+    local_environment = f'I have no recollection of ever meeting **{local_user}@{local_hostname}**'
     return local_environment
 
 
@@ -311,7 +311,7 @@ def get_oauth(client_id, client_secret, grant_type):
     return new_oauth_token
 
 
-def check_oath(oauth_token, client_id):
+def check_oauth(oauth_token, client_id):
     #checks oauth - if it is not 401 we can assume it is valid, else request a new one
     #call this instead of get_oauth()
     data = {
@@ -327,7 +327,7 @@ def check_oath(oauth_token, client_id):
 
 def twitch_getstatus(oauth_token, client_id):
     # check oauth
-    check_oath(oauth_token, client_id)
+    check_oauth(oauth_token, client_id)
     # set data
     data = {
         'Authorization': 'Bearer ' + oauth_token,
