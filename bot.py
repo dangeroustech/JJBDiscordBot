@@ -152,7 +152,7 @@ async def on_message(message):
 
     # context sensitive command - scheudle
     if '!schedule' in message.content:
-        response = 'Check out our stream schedule here: https://www.twitch.tv/jennytree95/schedule'
+        response = 'Check out our stream schedule here: https://www.twitch.tv/' + twitch_userID + '/schedule'
         await message.channel.send(response)
 
     # context sensitive command - stream status
@@ -230,6 +230,17 @@ async def send_reboot_message():
             break
 
 
+def parse_commands():
+    commands = {}
+
+    with open('README.md') as f:
+        for line in f:
+            if line[0] == '-':
+                commands.update({f'{line.lstrip("- ").rstrip()}': f'{f.readline().lstrip("- ").rstrip()}'})
+
+    return commands
+
+
 def add_royalist(quote):
     # add a royalist quote
     with open('royalist', 'a') as f:
@@ -293,14 +304,30 @@ def get_oauth(client_id, client_secret, grant_type):
         "https://id.twitch.tv/oauth2/token?client_id=" + client_id + "&client_secret=" + client_secret + "&grant_type=" + grant_type)
     if oauth_request.status_code == 200:
         json_response = json.loads(oauth_request.text)
-        #print(json_response)
-        global oauth_timer
-        oauth_timer = (json_response['expires_in'])
         new_oauth_token = str((json_response['access_token']))
+    else:
+        print("Unable to obtain Twitch API OAUTH token")
+        new_oauth_token = ""
     return new_oauth_token
 
 
+def check_oath(oauth_token, client_id):
+    #checks oauth - if it is not 401 we can assume it is valid, else request a new one
+    #call this instead of get_oauth()
+    data = {
+        'Authorization': 'Bearer ' + oauth_token,
+        'Client-Id': client_id
+    }
+    # api call here
+    status_response = requests.get(url=API_ENDPOINT, headers=data)
+    if status_response.status_code == 401:
+        get_oauth(client_id, client_secret, grant_type)
+    return
+
+
 def twitch_getstatus(oauth_token, client_id):
+    # check oauth
+    check_oath(oauth_token, client_id)
     # set data
     data = {
         'Authorization': 'Bearer ' + oauth_token,
@@ -311,13 +338,10 @@ def twitch_getstatus(oauth_token, client_id):
     # data output
     if status_response.status_code == 200:
         json_response = json.loads(status_response.text)
-        #print(json_response)
         twitch_data = str((json_response['data']))
         if twitch_data == "[]":
             return (twitch_userID + " is currently OFFLINE")
         else:
-            twitch_game_id = str((json_response['data'][0]['game_id']))
-            #twitch_game_name = str(twitch_getgamename(twitch_game_id)) #can't get this to work right now...
             return ("**" + twitch_userID + "** is currently LIVE :movie_camera:\nGo watch here: https://twitch.tv/" + twitch_userID)
 
 
@@ -329,7 +353,6 @@ def twitch_getgamename(twitch_game_id):
     getgamename_response = requests.get(url="https://api.twitch.tv/helix/games?id=" + twitch_game_id, headers=data)
     if getgamename_response.status_code == 200:
         json_response = json.loads(getgamename_response.text)
-        #print(json_response)
         game_name = (json_response['data'][0]['name'])
         return game_name
 
