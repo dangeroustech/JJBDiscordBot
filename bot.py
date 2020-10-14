@@ -21,11 +21,12 @@ client_id = os.getenv('client_id')
 client_secret = os.getenv('client_secret')
 grant_type = os.getenv('grant_type')
 twitch_userID = os.getenv('twitch_userID')
-API_ENDPOINT = "https://api.twitch.tv/helix/streams?user_login=" + twitch_userID
+API_ENDPOINT = f'https://api.twitch.tv/helix/streams?user_login={twitch_userID}'
 guildID = 0
 oauth_token = ""
 oauth_timer = 0
 logger = logging.getLogger()
+log_level = logging.DEBUG
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -38,6 +39,8 @@ def main(argv):
                                      description='I want to be the very sweat-lessest, like no-one ever was')
     parser.add_argument('-d', '--debug', required=False, help='Set Debug Mode for Local Dev', action='store_true')
     args = parser.parse_args()
+
+    setup_logging()
 
     if args.debug:
         debug = True
@@ -60,16 +63,16 @@ async def on_ready():
 
     # exit if something is wrong with the guild discovery
     if guild == 0:
-        print('Something\'s Wrong... Please to be Fixing...')
+        logger.error('Something\'s Wrong... Please to be Fixing...')
         sys.exit(999)
 
-    print(
+    logger.info(
         f'{client.user} is connected to the following guild:\n'
         f'{guild.name}(id: {guild.id})'
     )
 
     for member in guild.members:
-        print(f' - {member.name}')
+        logger.info(f' - {member.name}')
 
     if not debug:
         await send_reboot_message()
@@ -119,7 +122,6 @@ async def on_message(message):
             await message.channel.send(''.join(list_royalist()))
         else:
             # maybe send a DM here too
-            print(message.author.name)
             await message.delete()
 
     # get active/runnin instance information - all running instances respond (only if approved user)
@@ -132,7 +134,6 @@ async def on_message(message):
             await message.channel.send(get_environment())
         else:
             # maybe send a DM here too
-            print(message.author.name)
             await message.delete()
 
     # delete a royalist command (only if approved user)
@@ -149,7 +150,6 @@ async def on_message(message):
                 await message.channel.send("Removed Quote: {}".format(response))
         else:
             # maybe send a DM here too
-            print(message.author.name)
             await message.delete()
 
     # context sensitive command - scheudle
@@ -169,6 +169,7 @@ async def on_message(message):
         if message.content == '!acceptrules':
             guild = client.get_guild(guildID)
             member = guild.get_member(message.author.id)
+            logger.info(f'User {message.author} accepted the rules!')
             await member.add_roles(guild.get_role(762318229514485801), reason=f'User {message.author} accepted rules')
             await message.delete()
         # handle users posting something else in this channel
@@ -177,6 +178,7 @@ async def on_message(message):
                 message.author.name != 'biodrone' or
                 message.author.name != 'Tombo_-'
         ):
+            logger.info(f'{message.author} just posted {message.content}')
             await message.delete()
 
 
@@ -308,7 +310,7 @@ def get_oauth(client_id, client_secret, grant_type):
         json_response = json.loads(oauth_request.text)
         new_oauth_token = str((json_response['access_token']))
     else:
-        print("Unable to obtain Twitch API OAUTH token")
+        logger.error("Unable to obtain Twitch API OAUTH token")
         new_oauth_token = ""
     return new_oauth_token
 
@@ -357,6 +359,34 @@ def twitch_getgamename(twitch_game_id):
         json_response = json.loads(getgamename_response.text)
         game_name = (json_response['data'][0]['name'])
         return game_name
+
+
+def setup_logging():
+    global logger, log_level
+
+    log_format = '%(asctime)s %(levelname)s: %(message)s'
+    logger = stream_logger(log_level, log_format)
+
+
+def stream_logger(level, fmt):
+    """
+    Logger for writing to stdout (mainly for Docker)
+    Use as such:
+        logger.INFO("A thing to log at INFO level")
+        logger.DEBUG("A thing to log at DEBUG level")
+    """
+    global logger
+
+    logger = logging.getLogger()
+    logger.setLevel(level)
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(level)
+    formatter = logging.Formatter(fmt)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    return logger
 
 
 if __name__ == '__main__':
