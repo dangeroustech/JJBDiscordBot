@@ -9,6 +9,7 @@ import json
 import requests
 import getpass
 import socket
+import logging
 from dotenv import load_dotenv
 
 debug = False
@@ -24,6 +25,7 @@ API_ENDPOINT = "https://api.twitch.tv/helix/streams?user_login=" + twitch_userID
 guildID = 0
 oauth_token = ""
 oauth_timer = 0
+logger = logging.getLogger()
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -33,7 +35,7 @@ def main(argv):
     global debug
 
     parser = argparse.ArgumentParser(prog='python bot.py',
-                                     description='Be a swagalicious royalist discord bot')
+                                     description='I want to be the very sweat-lessest, like no-one ever was')
     parser.add_argument('-d', '--debug', required=False, help='Set Debug Mode for Local Dev', action='store_true')
     args = parser.parse_args()
 
