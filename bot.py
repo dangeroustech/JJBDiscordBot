@@ -164,42 +164,42 @@ async def on_message(message):
         await message.channel.send(response)
 
     # controls role assignment for those who accept
-    if message.channel.name == 'welcome-and-rules':
-        # grant users the 'ThirstTrap' role
-        if message.content == '!acceptrules':
-            guild = client.get_guild(guildID)
-            member = guild.get_member(message.author.id)
-            logger.info(f'User {message.author} accepted the rules!')
-            await member.add_roles(guild.get_role(762318229514485801), reason=f'User {message.author} accepted rules')
-            await message.delete()
-        # handle users posting something else in this channel
-        elif (
-                message.author.name != 'Rocketman162' or
-                message.author.name != 'biodrone' or
-                message.author.name != 'Tombo_-'
-        ):
-            logger.info(f'{message.author} just posted {message.content}')
-            await message.delete()
+    # if message.channel.name == 'welcome-and-rules':
+    #     # grant users the 'ThirstTrap' role
+    #     if message.content == '!acceptrules':
+    #         guild = client.get_guild(guildID)
+    #         member = guild.get_member(message.author.id)
+    #         logger.info(f'User {message.author} accepted the rules!')
+    #         await member.add_roles(guild.get_role(762318229514485801), reason=f'User {message.author} accepted rules')
+    #         await message.delete()
+    #     # handle users posting something else in this channel
+    #     elif (
+    #             message.author.name != 'Rocketman162' or
+    #             message.author.name != 'biodrone' or
+    #             message.author.name != 'Tombo_-'
+    #     ):
+    #         logger.info(f'{message.author} just posted {message.content}')
+    #         await message.delete()
 
 
 # post current commands to the welcome channel
-async def post_commands():
-    global guildID
+# async def post_commands():
+#     global guildID
 
-    guild = client.get_guild(guildID)
+#     guild = client.get_guild(guildID)
 
-    for channel in guild.channels:
-        if channel.name == 'welcome-and-rules':
-            await delete_old_commands(channel)
+#     for channel in guild.channels:
+#         if channel.name == 'welcome-and-rules':
+#             await delete_old_commands(channel)
 
-            commands = parse_commands()
+#             commands = parse_commands()
 
-            ls = "My commands are:\n"
-            for key in commands:
-                ls = ls + key + "\n" + "  - " + commands[key] + "\n"
+#             ls = "My commands are:\n"
+#             for key in commands:
+#                 ls = ls + key + "\n" + "  - " + commands[key] + "\n"
 
-            await channel.send(ls.replace("him", "me").replace("his", "my"))
-            break
+#             await channel.send(ls.replace("him", "me").replace("his", "my"))
+#             break
 
 
 # parse the currently available commands
