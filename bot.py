@@ -76,7 +76,7 @@ async def on_ready():
 
     if not debug:
         await send_reboot_message()
-        await post_commands()
+        #await post_commands()
 
 
 # runs when client receives a message
@@ -230,6 +230,7 @@ async def send_reboot_message():
     for channel in guild.channels:
         if channel.name == 'bot-test':
             run_environment = get_environment()
+            logger.debug(f'Rebooting due to rebuild, environment: {run_environment}')
             await channel.send('Bleep Bloop, I\'ve Rebuilt.\nGod Save The One Formerly Named Markle\n' + run_environment)
             break
 
